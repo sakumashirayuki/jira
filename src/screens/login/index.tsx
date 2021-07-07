@@ -1,7 +1,30 @@
 import React, { FormEvent } from "react";
 
+const apiUrl = process.env.REACT_APP_API_URL;
+
 export const LoginScreen = () => {
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {};
+  const login = (param: { username: string; password: string }) => {
+    fetch(`${apiUrl}/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(param),
+    }).then(async (response) => {
+      if (response.ok) {
+      }
+    });
+  };
+
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    console.log(event.currentTarget.elements);
+    const username = (event.currentTarget.elements[0] as HTMLInputElement)
+      .value; // 这是由于默认的Element类型没有value这个property
+    const password = (event.currentTarget.elements[1] as HTMLInputElement)
+      .value;
+    login({ username, password });
+  };
 
   return (
     <form onSubmit={handleSubmit}>
