@@ -18,7 +18,6 @@ export const LoginScreen = () => {
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log(event.currentTarget.elements);
     const username = (event.currentTarget.elements[0] as HTMLInputElement)
       .value; // 这是由于默认的Element类型没有value这个property
     const password = (event.currentTarget.elements[1] as HTMLInputElement)
