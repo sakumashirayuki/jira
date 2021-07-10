@@ -49,6 +49,7 @@ export const http = async (
 
 export const useHttp = () => {
   const { user } = useAuth();
-  return (...[endpoint, config]: Parameters<typeof http>) =>
-    http(endpoint, { ...config, token: user?.token });
+  return (
+    ...[endpoint, config]: Parameters<typeof http> // 这里的typeof是ts中的typeof
+  ) => http(endpoint, { ...config, token: user?.token });
 };
