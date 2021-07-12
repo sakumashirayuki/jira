@@ -4,13 +4,12 @@ export const isVoid = (value: unknown) => {
   return value === undefined || value === null || value === ""; // this change the type of value to Boolean
 };
 
-export const cleanObject = (object: object) => {
+// 这里object的类型设定可以限制object为键值对对象。排除了函数、正则表达式对象
+export const cleanObject = (object: { [key: string]: unknown }) => {
   const result = { ...object };
   Object.keys(object).forEach((key) => {
-    // @ts-ignore
     const value = object[key];
     if (isVoid(value)) {
-      // @ts-ignore
       delete result[key];
     }
   });
@@ -20,6 +19,8 @@ export const cleanObject = (object: object) => {
 export const useMount = (callback: () => void) => {
   useEffect(() => {
     callback();
+    // 如果在依赖项中加上callback()，会造成无限循环，这个和useCallback和useMemo有关系
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 };
 
