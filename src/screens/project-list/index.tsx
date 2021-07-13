@@ -1,36 +1,31 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import styled from "@emotion/styled";
+import { Typography } from "antd";
 
 import { SearchPanel } from "./search-panel";
 import { List } from "./list";
-import { cleanObject, useDebounce, useMount } from "utils";
-import { useHttp } from "utils/http";
-import styled from "@emotion/styled";
+import { useDebounce } from "utils";
+import { useProjects } from "utils/project";
+import { useUsers } from "utils/user";
 
 export const ProjectListScreen = () => {
   const [param, setParam] = useState({
     name: "",
     personId: "",
   });
-  const [list, setList] = useState([]);
-  const [users, setUsers] = useState([]);
-  const client = useHttp();
-
   const debouncedParam = useDebounce(param, 200);
-
-  useEffect(() => {
-    client("projects", { data: cleanObject(debouncedParam) }).then(setList);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedParam]);
-
-  useMount(() => {
-    client("users").then(setUsers);
-  });
+  const { isLoading, error, data: list } = useProjects(debouncedParam);
+  const { data: users } = useUsers();
 
   return (
     <Container>
       <h1>项目列表</h1>
-      <SearchPanel param={param} setParam={setParam} users={users} />
-      <List list={list} users={users} />
+      <SearchPanel param={param} setParam={setParam} users={users || []} />
+      {error && (
+        <Typography.Text type="danger">{error.message}</Typography.Text>
+      )}
+      {/* dataSource是TableProps中的属性 */}
+      <List loading={isLoading} dataSource={list || []} users={users || []} />
     </Container>
   );
 };

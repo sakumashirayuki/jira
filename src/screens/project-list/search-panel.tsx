@@ -1,5 +1,4 @@
 import { Input, Select, Form } from "antd";
-import React from "react";
 
 export interface User {
   id: string;

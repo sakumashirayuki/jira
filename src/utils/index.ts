@@ -25,6 +25,7 @@ export const useMount = (callback: () => void) => {
 };
 
 // 后面用泛型
+// 括号前的<V>帮助我们获得参数的类型
 export const useDebounce = <V>(value: V, delay?: number) => {
   const [debouncedValue, setDebouncedValue] = useState(value);
   useEffect(() => {
