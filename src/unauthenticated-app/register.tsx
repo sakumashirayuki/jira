@@ -1,12 +1,33 @@
 import { useAuth } from "context/auth-context";
 import { Form, Input } from "antd";
 import { LongButton } from "unauthenticated-app";
+import { useAsync } from "utils/use-async";
 
-export const RegisterScreen = () => {
+export const RegisterScreen = ({
+  onError,
+}: {
+  onError: (error: Error) => void;
+}) => {
   const { register } = useAuth();
+  const { run, isLoading } = useAsync(undefined, { throwOnError: true });
 
-  const handleSubmit = (values: { username: string; password: string }) => {
-    register(values);
+  const handleSubmit = async ({
+    cpassword,
+    ...values
+  }: {
+    username: string;
+    password: string;
+    cpassword: string;
+  }) => {
+    if (cpassword === values.password) {
+      try {
+        await run(register(values)); // 注意这一步是异步的
+      } catch (error) {
+        onError(error);
+      }
+    } else {
+      onError(new Error("请确认两次输入的密码相同"));
+    }
   };
 
   return (
@@ -23,8 +44,14 @@ export const RegisterScreen = () => {
       >
         <Input type="password" id="password" placeholder="密码" />
       </Form.Item>
+      <Form.Item
+        name="cpassword"
+        rules={[{ required: true, message: "请确认密码" }]}
+      >
+        <Input type="password" id="cpassword" placeholder="确认密码" />
+      </Form.Item>
       <Form.Item>
-        <LongButton htmlType="submit" type="primary">
+        <LongButton htmlType="submit" type="primary" loading={isLoading}>
           注册
         </LongButton>
       </Form.Item>

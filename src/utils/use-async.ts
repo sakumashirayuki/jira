@@ -12,7 +12,15 @@ const defaultInitState: State<null> = {
   stat: "idle",
 };
 
-export const useAsync = <D>(initialState?: State<D>) => {
+const defaultConfig = {
+  throwOnError: false,
+};
+
+export const useAsync = <D>(
+  initialState?: State<D>,
+  initialConfig?: typeof defaultConfig
+) => {
+  const config = { ...defaultConfig, ...initialConfig }; //用传入的initialConfig覆盖defaultConfig
   const [state, setState] = useState<State<D>>({
     ...defaultInitState,
     ...initialState,
@@ -51,7 +59,9 @@ export const useAsync = <D>(initialState?: State<D>) => {
       })
       .catch((error) => {
         setError(error);
-        return error;
+        if (config.throwOnError) return Promise.reject(error);
+        // 让外部能够接收到异常
+        else return error; // 外部不会接收到异常
       });
   };
 
