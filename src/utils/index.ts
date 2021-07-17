@@ -37,3 +37,22 @@ export const useDebounce = <V>(value: V, delay?: number) => {
   }, [value, delay]);
   return debouncedValue;
 };
+
+export const useDocumentTitle = (
+  title: string,
+  keepOnUnmount: boolean = true
+) => {
+  const oldTitle = document.title;
+  console.log("渲染时的oldTitle", oldTitle);
+  useEffect(() => {
+    document.title = title;
+  }, [title]);
+  useEffect(() => {
+    return () => {
+      if (!keepOnUnmount) {
+        document.title = oldTitle; // set the title back as the previous title
+        console.log("卸载时的oldTitle", oldTitle);
+      }
+    };
+  }, []);
+};
