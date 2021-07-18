@@ -45,7 +45,7 @@ export const useDocumentTitle = (
 ) => {
   // useRef可以方便地保存任何可变的值
   const oldTitle = useRef(document.title).current;
-  console.log("渲染时的oldTitle", oldTitle);
+  // console.log("渲染时的oldTitle", oldTitle);
   useEffect(() => {
     document.title = title;
   }, [title]);
