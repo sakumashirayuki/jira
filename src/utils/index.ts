@@ -59,3 +59,6 @@ export const useDocumentTitle = (
     };
   }, [keepOnUnmount, oldTitle]);
 };
+
+// 重置路由状态，也可以刷新界面
+export const resetRoute = () => (window.location.href = window.location.origin);
