@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export const isVoid = (value: unknown) => {
   return value === undefined || value === null || value === ""; // this change the type of value to Boolean
@@ -38,15 +38,18 @@ export const useDebounce = <V>(value: V, delay?: number) => {
   return debouncedValue;
 };
 
+// React hook与闭包
 export const useDocumentTitle = (
   title: string,
   keepOnUnmount: boolean = true
 ) => {
-  const oldTitle = document.title;
+  // useRef可以方便地保存任何可变的值
+  const oldTitle = useRef(document.title).current;
   console.log("渲染时的oldTitle", oldTitle);
   useEffect(() => {
     document.title = title;
   }, [title]);
+  // 闭包，这里读到的是旧title
   useEffect(() => {
     return () => {
       if (!keepOnUnmount) {
@@ -54,5 +57,5 @@ export const useDocumentTitle = (
         console.log("卸载时的oldTitle", oldTitle);
       }
     };
-  }, []);
+  }, [keepOnUnmount, oldTitle]);
 };
