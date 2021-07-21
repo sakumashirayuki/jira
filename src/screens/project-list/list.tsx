@@ -1,7 +1,9 @@
 import { Table } from "antd";
 import { TableProps } from "antd/es/table";
+import { Pin } from "components/pin";
 import dayjs from "dayjs";
 import { Link } from "react-router-dom";
+import { useEditProject } from "utils/project";
 import { User } from "./search-panel";
 
 export interface Project {
@@ -19,10 +21,24 @@ interface ListProps extends TableProps<Project> {
 }
 
 export const List = ({ users, ...props }: ListProps) => {
+  const { mutate } = useEditProject();
+  //柯里化
+  const pinProject = (id: number) => (pin: boolean) => mutate({ id, pin });
   return (
     <Table
       pagination={false}
       columns={[
+        {
+          title: <Pin checked={true} disabled={true} />,
+          render(value, project) {
+            return (
+              <Pin
+                checked={project.pin}
+                onCheckedChange={pinProject(project.id)}
+              />
+            );
+          },
+        },
         {
           title: "名称",
           sorter: (a, b) => a.name.localeCompare(b.name), // 这里传入的a和b都是project
