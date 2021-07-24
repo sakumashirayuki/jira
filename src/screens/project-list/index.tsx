@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { Typography } from "antd";
+import { Button, Typography } from "antd";
 
 import { SearchPanel } from "./search-panel";
 import { List } from "./list";
@@ -13,7 +13,7 @@ export const ProjectListScreen = () => {
 
   const [param, setParam] = useProjectsSearchParams();
   const debouncedParam = useDebounce(param, 200);
-  const { isLoading, error, data: list } = useProjects(debouncedParam);
+  const { isLoading, error, data: list, retry } = useProjects(debouncedParam);
   const { data: users } = useUsers();
 
   return (
@@ -24,7 +24,12 @@ export const ProjectListScreen = () => {
         <Typography.Text type="danger">{error.message}</Typography.Text>
       )}
       {/* dataSource是TableProps中的属性 */}
-      <List loading={isLoading} dataSource={list || []} users={users || []} />
+      <List
+        refresh={retry}
+        loading={isLoading}
+        dataSource={list || []}
+        users={users || []}
+      />
     </Container>
   );
 };

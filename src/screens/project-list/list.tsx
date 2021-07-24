@@ -18,12 +18,14 @@ export interface Project {
 interface ListProps extends TableProps<Project> {
   // ListProps包含了Table上所有属性的集合
   users: User[];
+  refresh?: () => void;
 }
 
 export const List = ({ users, ...props }: ListProps) => {
   const { mutate } = useEditProject();
   //柯里化
-  const pinProject = (id: number) => (pin: boolean) => mutate({ id, pin });
+  const pinProject = (id: number) => (pin: boolean) =>
+    mutate({ id, pin }).then(props.refresh);
   return (
     <Table
       pagination={false}
@@ -34,6 +36,7 @@ export const List = ({ users, ...props }: ListProps) => {
             return (
               <Pin
                 checked={project.pin}
+                // 这里如果写成()=>pinProject(project.id)，将无法捕捉到pin的值
                 onCheckedChange={pinProject(project.id)}
               />
             );

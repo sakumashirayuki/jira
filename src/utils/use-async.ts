@@ -26,6 +26,8 @@ export const useAsync = <D>(
     ...initialState,
   });
 
+  const [retry, setRetry] = useState(() => () => {});
+
   const setData = (data: D) => {
     setState({
       data,
@@ -43,11 +45,19 @@ export const useAsync = <D>(
   };
 
   // run函数用于触发异步请求
-  const run = (promise: Promise<D>) => {
+  const run = (
+    promise: Promise<D>,
+    runConfig?: { retry: () => Promise<D> }
+  ) => {
     if (!promise || !promise.then) {
       // 当什么都没有传或者传入的不是promise时
       throw new Error("please pass in Promise");
     }
+    // 保存promise函数
+    setRetry(() => () => {
+      // retry是个函数，这里调用retry函数，并将返回的promise赋给run
+      if (runConfig?.retry) run(runConfig?.retry(), runConfig);
+    });
     setState({
       ...state,
       stat: "loading",
@@ -73,6 +83,8 @@ export const useAsync = <D>(
     run,
     setData,
     setError,
+    // retry被调用时，重新跑一遍run，让state刷新
+    retry,
     ...state,
   };
 };
