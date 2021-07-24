@@ -62,3 +62,17 @@ export const useDocumentTitle = (
 
 // 重置路由状态，也可以刷新界面
 export const resetRoute = () => (window.location.href = window.location.origin);
+
+/**
+ * 返回组件的挂载状态，如果还没挂载或者已经卸载，返回false；反之，返回true
+ */
+export const useMountedRef = () => {
+  const moutedRef = useRef(false);
+  useEffect(() => {
+    moutedRef.current = true;
+    return () => {
+      moutedRef.current = false;
+    };
+  });
+  return moutedRef;
+};

@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { Button, Typography } from "antd";
+import { Typography } from "antd";
 
 import { SearchPanel } from "./search-panel";
 import { List } from "./list";
