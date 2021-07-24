@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useMountedRef } from "utils";
 
 interface State<D> {
@@ -30,53 +30,56 @@ export const useAsync = <D>(
 
   const [retry, setRetry] = useState(() => () => {});
 
-  const setData = (data: D) => {
+  const setData = useCallback((data: D) => {
     setState({
       data,
       stat: "success",
       error: null,
     });
-  };
+  }, []);
 
-  const setError = (error: Error) => {
+  const setError = useCallback((error: Error) => {
     setState({
       error,
       data: null,
       stat: "error",
     });
-  };
+  }, []);
 
   // run函数用于触发异步请求
-  const run = (
-    promise: Promise<D>,
-    runConfig?: { retry: () => Promise<D> }
-  ) => {
-    if (!promise || !promise.then) {
-      // 当什么都没有传或者传入的不是promise时
-      throw new Error("please pass in Promise");
-    }
-    // 保存promise函数
-    setRetry(() => () => {
-      // retry是个函数，这里调用retry函数，并将返回的promise赋给run
-      if (runConfig?.retry) run(runConfig?.retry(), runConfig);
-    });
-    setState({
-      ...state,
-      stat: "loading",
-    });
-    return promise
-      .then((data) => {
-        // 避免组件已经卸载了，还在赋值 的情况发生
-        if (mountedRef) setData(data);
-        return data; // 这里返回的仍然是一个promise
-      })
-      .catch((error) => {
-        setError(error);
-        if (config.throwOnError) return Promise.reject(error);
-        // 让外部能够接收到异常
-        else return error; // 外部不会接收到异常
+  const run = useCallback(
+    (promise: Promise<D>, runConfig?: { retry: () => Promise<D> }) => {
+      if (!promise || !promise.then) {
+        // 当什么都没有传或者传入的不是promise时
+        throw new Error("please pass in Promise");
+      }
+      // 保存promise函数
+      setRetry(() => () => {
+        // retry是个函数，这里调用retry函数，并将返回的promise赋给run
+        if (runConfig?.retry) run(runConfig?.retry(), runConfig);
       });
-  };
+      // 使用prevState，避免将state作为依赖
+      setState((prevState) => {
+        return {
+          ...prevState,
+          stat: "loading",
+        };
+      });
+      return promise
+        .then((data) => {
+          // 避免组件已经卸载了，还在赋值 的情况发生
+          if (mountedRef) setData(data);
+          return data; // 这里返回的仍然是一个promise
+        })
+        .catch((error) => {
+          setError(error);
+          if (config.throwOnError) return Promise.reject(error);
+          // 让外部能够接收到异常
+          else return error; // 外部不会接收到异常
+        });
+    },
+    [config.throwOnError, mountedRef, setData, setError]
+  );
 
   return {
     isIdle: state.stat === "idle",
