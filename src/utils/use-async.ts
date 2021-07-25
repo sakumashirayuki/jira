@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useReducer, useState } from "react";
 import { useMountedRef } from "utils";
 
 interface State<D> {
@@ -17,34 +17,52 @@ const defaultConfig = {
   throwOnError: false,
 };
 
+// 避免组件已经卸载了，还在赋值 的情况发生
+const useSafeDispatch = <T>(dispatch: (...args: T[]) => void) => {
+  const mountedRef = useMountedRef();
+  return useCallback(
+    (...args: T[]) => (mountedRef.current ? dispatch(...args) : void 0),
+    [dispatch, mountedRef]
+  );
+};
+
 export const useAsync = <D>(
   initialState?: State<D>,
   initialConfig?: typeof defaultConfig
 ) => {
   const config = { ...defaultConfig, ...initialConfig }; //用传入的initialConfig覆盖defaultConfig
-  const [state, setState] = useState<State<D>>({
-    ...defaultInitState,
-    ...initialState,
-  });
-  const mountedRef = useMountedRef();
+  const [state, dispatch] = useReducer(
+    (state: State<D>, action: Partial<State<D>>) => ({ ...state, ...action }),
+    {
+      ...defaultInitState,
+      ...initialState,
+    }
+  );
+  const safeDispatch = useSafeDispatch(dispatch);
 
   const [retry, setRetry] = useState(() => () => {});
 
-  const setData = useCallback((data: D) => {
-    setState({
-      data,
-      stat: "success",
-      error: null,
-    });
-  }, []);
+  const setData = useCallback(
+    (data: D) => {
+      safeDispatch({
+        data,
+        stat: "success",
+        error: null,
+      });
+    },
+    [safeDispatch]
+  );
 
-  const setError = useCallback((error: Error) => {
-    setState({
-      error,
-      data: null,
-      stat: "error",
-    });
-  }, []);
+  const setError = useCallback(
+    (error: Error) => {
+      safeDispatch({
+        error,
+        data: null,
+        stat: "error",
+      });
+    },
+    [safeDispatch]
+  );
 
   // run函数用于触发异步请求
   const run = useCallback(
@@ -59,16 +77,12 @@ export const useAsync = <D>(
         if (runConfig?.retry) run(runConfig?.retry(), runConfig);
       });
       // 使用prevState，避免将state作为依赖
-      setState((prevState) => {
-        return {
-          ...prevState,
-          stat: "loading",
-        };
-      });
+      safeDispatch({ stat: "loading" });
       return promise
         .then((data) => {
-          // 避免组件已经卸载了，还在赋值 的情况发生
-          if (mountedRef) setData(data);
+          // 因为setData已经是safeDispatch
+          // 这里无需再判断mountedRef时候存在
+          setData(data);
           return data; // 这里返回的仍然是一个promise
         })
         .catch((error) => {
@@ -78,7 +92,7 @@ export const useAsync = <D>(
           else return error; // 外部不会接收到异常
         });
     },
-    [config.throwOnError, mountedRef, setData, setError]
+    [config.throwOnError, setData, setError, safeDispatch]
   );
 
   return {
