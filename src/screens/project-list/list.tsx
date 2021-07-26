@@ -3,8 +3,10 @@ import { TableProps } from "antd/es/table";
 import { ButtonNoPadding } from "components/lib";
 import { Pin } from "components/pin";
 import dayjs from "dayjs";
+import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import { useEditProject } from "utils/project";
+import { projectListActions } from "./project-list.slice";
 import { User } from "./search-panel";
 
 export interface Project {
@@ -20,10 +22,10 @@ interface ListProps extends TableProps<Project> {
   // ListProps包含了Table上所有属性的集合
   users: User[];
   refresh?: () => void;
-  projectButton: JSX.Element;
 }
 
 export const List = ({ users, ...props }: ListProps) => {
+  const dispatch = useDispatch();
   const { mutate } = useEditProject();
   //柯里化
   const pinProject = (id: number) => (pin: boolean) =>
@@ -85,7 +87,16 @@ export const List = ({ users, ...props }: ListProps) => {
               <Dropdown
                 overlay={
                   <Menu>
-                    <Menu.Item key="edit">{props.projectButton}</Menu.Item>
+                    <Menu.Item key="edit">
+                      <ButtonNoPadding
+                        type="link"
+                        onClick={() =>
+                          dispatch(projectListActions.openProjectModal())
+                        }
+                      >
+                        编辑
+                      </ButtonNoPadding>
+                    </Menu.Item>
                   </Menu>
                 }
               >

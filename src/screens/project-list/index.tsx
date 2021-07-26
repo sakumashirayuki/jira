@@ -7,11 +7,14 @@ import { useDebounce, useDocumentTitle } from "utils";
 import { useProjects } from "utils/project";
 import { useUsers } from "utils/user";
 import { useProjectsSearchParams } from "./utils";
-import { Row } from "components/lib";
+import { ButtonNoPadding, Row } from "components/lib";
+import { useDispatch } from "react-redux";
+import { projectListActions } from "./project-list.slice";
 
-export const ProjectListScreen = (props: { projectButton: JSX.Element }) => {
+export const ProjectListScreen = () => {
   useDocumentTitle("项目列表", false);
 
+  const dispatch = useDispatch();
   const [param, setParam] = useProjectsSearchParams();
   const debouncedParam = useDebounce(param, 200);
   const { isLoading, error, data: list, retry } = useProjects(debouncedParam);
@@ -21,7 +24,12 @@ export const ProjectListScreen = (props: { projectButton: JSX.Element }) => {
     <Container>
       <Row between={true}>
         <h1>项目列表</h1>
-        {props.projectButton}
+        <ButtonNoPadding
+          type="link"
+          onClick={() => dispatch(projectListActions.openProjectModal())}
+        >
+          创建项目
+        </ButtonNoPadding>
       </Row>
       <SearchPanel param={param} setParam={setParam} users={users || []} />
       {error && (
@@ -29,7 +37,6 @@ export const ProjectListScreen = (props: { projectButton: JSX.Element }) => {
       )}
       {/* dataSource是TableProps中的属性 */}
       <List
-        projectButton={props.projectButton}
         refresh={retry}
         loading={isLoading}
         dataSource={list || []}
