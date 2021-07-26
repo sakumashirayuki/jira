@@ -20,15 +20,14 @@ export interface Project {
 interface ListProps extends TableProps<Project> {
   // ListProps包含了Table上所有属性的集合
   users: User[];
-  refresh?: () => void;
 }
 
 export const List = ({ users, ...props }: ListProps) => {
   const { mutate } = useEditProject();
+  const { startEdit } = useProjectModal();
   //柯里化
-  const pinProject = (id: number) => (pin: boolean) =>
-    mutate({ id, pin }).then(props.refresh);
-  const { open } = useProjectModal();
+  const pinProject = (id: number) => (pin: boolean) => mutate({ id, pin });
+  const editProject = (id: number) => () => startEdit(id);
   return (
     <Table
       pagination={false}
@@ -86,11 +85,10 @@ export const List = ({ users, ...props }: ListProps) => {
               <Dropdown
                 overlay={
                   <Menu>
-                    <Menu.Item key="edit">
-                      <ButtonNoPadding type="link" onClick={open}>
-                        编辑
-                      </ButtonNoPadding>
+                    <Menu.Item key="edit" onClick={editProject(project.id)}>
+                      <ButtonNoPadding type="link">编辑</ButtonNoPadding>
                     </Menu.Item>
+                    <Menu.Item key="delete">删除</Menu.Item>
                   </Menu>
                 }
               >

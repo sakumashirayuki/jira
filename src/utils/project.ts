@@ -1,60 +1,62 @@
-import { useCallback, useEffect } from "react";
+import { useMutation, useQuery, useQueryClient } from "react-query";
 import { Project } from "screens/project-list/list";
-import { cleanObject } from "utils";
 import { useHttp } from "./http";
-import { useAsync } from "./use-async";
 
 export const useProjects = (param?: Partial<Project>) => {
   // name 和 personId都是Project参数的一部分
   const client = useHttp();
-  const { run, ...result } = useAsync<Project[]>();
-
-  const fetchProjects = useCallback(
-    () => client("projects", { data: cleanObject(param || {}) }),
-    [client, param]
+  // 当第一个参数数组内的值变化时，就会触发
+  return useQuery<Project[]>(["projects", param], () =>
+    client("projects", { data: param })
   );
-
-  useEffect(() => {
-    run(fetchProjects(), {
-      retry: fetchProjects,
-    });
-  }, [param, run, fetchProjects]);
-  return result;
 };
 
 export const useEditProject = () => {
-  const { run, ...asyncResult } = useAsync();
   const client = useHttp();
-  const mutate = (params: Partial<Project>) => {
-    // console.log(params);
-    return run(
+  // useQueryClient返回QueryClient实例，QueryClient用于与cache交互
+  const queryClient = useQueryClient();
+  // useMutation用于create/update/delete data
+  return useMutation(
+    (params: Partial<Project>) =>
       client(`projects/${params.id}`, {
-        data: params,
         method: "PATCH",
-      })
-    );
-  };
-
-  return {
-    mutate,
-    ...asyncResult,
-  };
+        data: params,
+      }),
+    {
+      // invalidateQueries用于refetch query，这里的'projects'可以直接弱匹配到所有以'projects'开头的
+      onSuccess: () => {
+        console.log("success");
+        queryClient.invalidateQueries("projects");
+      },
+    }
+  );
 };
 
 export const useAddProject = () => {
-  const { run, ...asyncResult } = useAsync();
   const client = useHttp();
-  const mutate = (params: Partial<Project>) => {
-    return run(
-      client(`projects/${params.id}`, {
-        data: params,
+  const queryClient = useQueryClient();
+  return useMutation(
+    (params: Partial<Project>) =>
+      client(`projects`, {
         method: "POST",
-      })
-    );
-  };
+        data: params,
+      }),
+    {
+      onSuccess: () => {
+        console.log("success");
+        queryClient.invalidateQueries("projects");
+      },
+    }
+  );
+};
 
-  return {
-    mutate,
-    ...asyncResult,
-  };
+// 为什么id是可选的？
+export const useProject = (id?: number) => {
+  const client = useHttp();
+  //当id为undefined时，不执行query
+  return useQuery<Project>(
+    ["project", { id }],
+    () => client(`projects/${id}`),
+    { enabled: !!id }
+  );
 };

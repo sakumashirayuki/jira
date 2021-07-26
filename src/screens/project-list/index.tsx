@@ -1,20 +1,18 @@
 import styled from "@emotion/styled";
-import { Button, Typography } from "antd";
-
 import { SearchPanel } from "./search-panel";
 import { List } from "./list";
 import { useDebounce, useDocumentTitle } from "utils";
 import { useProjects } from "utils/project";
 import { useUsers } from "utils/user";
 import { useProjectModal, useProjectsSearchParams } from "./utils";
-import { ButtonNoPadding, Row } from "components/lib";
+import { ButtonNoPadding, ErrorBox, Row } from "components/lib";
 
 export const ProjectListScreen = () => {
   useDocumentTitle("项目列表", false);
 
   const [param, setParam] = useProjectsSearchParams();
   const debouncedParam = useDebounce(param, 200);
-  const { isLoading, error, data: list, retry } = useProjects(debouncedParam);
+  const { isLoading, error, data: list } = useProjects(debouncedParam);
   const { data: users } = useUsers();
   const { open } = useProjectModal();
 
@@ -27,16 +25,9 @@ export const ProjectListScreen = () => {
         </ButtonNoPadding>
       </Row>
       <SearchPanel param={param} setParam={setParam} users={users || []} />
-      {error && (
-        <Typography.Text type="danger">{error.message}</Typography.Text>
-      )}
+      <ErrorBox error={error} />
       {/* dataSource是TableProps中的属性 */}
-      <List
-        refresh={retry}
-        loading={isLoading}
-        dataSource={list || []}
-        users={users || []}
-      />
+      <List loading={isLoading} dataSource={list || []} users={users || []} />
     </Container>
   );
 };
