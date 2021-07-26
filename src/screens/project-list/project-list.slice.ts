@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { RootState } from "store";
+import { RootState } from "store/index";
 
 interface State {
   projectModalOpen: boolean;
@@ -14,6 +14,7 @@ export const projectListSlice = createSlice({
   initialState,
   reducers: {
     openProjectModal(state) {
+      // 传参的时候不会涉及到state
       // state和action为reducers规定的形参，只是这两个函数用不到action的参数
       state.projectModalOpen = true;
     },
