@@ -6,6 +6,7 @@ import dayjs from "dayjs";
 import { Link } from "react-router-dom";
 import { useEditProject } from "utils/project";
 import { User } from "./search-panel";
+import { useProjectModal } from "./utils";
 
 export interface Project {
   id: number;
@@ -20,7 +21,6 @@ interface ListProps extends TableProps<Project> {
   // ListProps包含了Table上所有属性的集合
   users: User[];
   refresh?: () => void;
-  projectButton: JSX.Element;
 }
 
 export const List = ({ users, ...props }: ListProps) => {
@@ -28,6 +28,7 @@ export const List = ({ users, ...props }: ListProps) => {
   //柯里化
   const pinProject = (id: number) => (pin: boolean) =>
     mutate({ id, pin }).then(props.refresh);
+  const { open } = useProjectModal();
   return (
     <Table
       pagination={false}
@@ -85,7 +86,11 @@ export const List = ({ users, ...props }: ListProps) => {
               <Dropdown
                 overlay={
                   <Menu>
-                    <Menu.Item key="edit">{props.projectButton}</Menu.Item>
+                    <Menu.Item key="edit">
+                      <ButtonNoPadding type="link" onClick={open}>
+                        编辑
+                      </ButtonNoPadding>
+                    </Menu.Item>
                   </Menu>
                 }
               >

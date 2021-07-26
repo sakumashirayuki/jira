@@ -6,22 +6,25 @@ import { List } from "./list";
 import { useDebounce, useDocumentTitle } from "utils";
 import { useProjects } from "utils/project";
 import { useUsers } from "utils/user";
-import { useProjectsSearchParams } from "./utils";
-import { Row } from "components/lib";
+import { useProjectModal, useProjectsSearchParams } from "./utils";
+import { ButtonNoPadding, Row } from "components/lib";
 
-export const ProjectListScreen = (props: { projectButton: JSX.Element }) => {
+export const ProjectListScreen = () => {
   useDocumentTitle("项目列表", false);
 
   const [param, setParam] = useProjectsSearchParams();
   const debouncedParam = useDebounce(param, 200);
   const { isLoading, error, data: list, retry } = useProjects(debouncedParam);
   const { data: users } = useUsers();
+  const { open } = useProjectModal();
 
   return (
     <Container>
       <Row between={true}>
         <h1>项目列表</h1>
-        {props.projectButton}
+        <ButtonNoPadding type="link" onClick={open}>
+          创建项目
+        </ButtonNoPadding>
       </Row>
       <SearchPanel param={param} setParam={setParam} users={users || []} />
       {error && (
@@ -29,7 +32,6 @@ export const ProjectListScreen = (props: { projectButton: JSX.Element }) => {
       )}
       {/* dataSource是TableProps中的属性 */}
       <List
-        projectButton={props.projectButton}
         refresh={retry}
         loading={isLoading}
         dataSource={list || []}
