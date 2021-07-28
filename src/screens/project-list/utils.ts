@@ -13,6 +13,11 @@ export const useProjectsSearchParams = () => {
   return [projectsParam, setParam] as const;
 };
 
+export const useProjectsQueryKey = () => [
+  "projects",
+  useProjectsSearchParams()[0],
+];
+
 // 这个hook用到了router，使用它的组件应该被包裹在Router内部
 // 用url参数来保存全局状态
 export const useProjectModal = () => {

@@ -5,14 +5,18 @@ import { ErrorBox } from "components/lib";
 import { UserSelect } from "components/user-select";
 import { useEffect } from "react";
 import { useAddProject, useEditProject } from "utils/project";
-import { useProjectModal } from "./utils";
+import { useProjectModal, useProjectsQueryKey } from "./utils";
 
 export const ProjectModal = () => {
   const { projectModalOpen, close, editingProject, isLoading } =
     useProjectModal();
   const useMutateProject = editingProject ? useEditProject : useAddProject;
 
-  const { mutateAsync, error, isLoading: mutateLoading } = useMutateProject();
+  const {
+    mutateAsync,
+    error,
+    isLoading: mutateLoading,
+  } = useMutateProject(useProjectsQueryKey());
   const [form] = useForm(); // antd提供了hook，用于与Form双向绑定
   const onFinish = (values: any) => {
     // 与Form的onFinish接口的类型要求一致
@@ -66,7 +70,7 @@ export const ProjectModal = () => {
             <Form.Item label="负责人" name="personId">
               <UserSelect defaultOptionName="负责人" />
             </Form.Item>
-            <Form.Item>
+            <Form.Item style={{ textAlign: "right" }}>
               <Button loading={mutateLoading} type="primary" htmlType="submit">
                 提交
               </Button>

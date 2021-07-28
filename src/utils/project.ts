@@ -1,6 +1,11 @@
-import { useMutation, useQuery, useQueryClient } from "react-query";
+import { QueryKey, useMutation, useQuery } from "react-query";
 import { Project } from "screens/project-list/list";
 import { useHttp } from "./http";
+import {
+  useAddConfig,
+  useDeleteConfig,
+  useEditConfig,
+} from "./use-optimistic-options";
 
 export const useProjects = (param?: Partial<Project>) => {
   // name 和 personId都是Project参数的一部分
@@ -11,10 +16,9 @@ export const useProjects = (param?: Partial<Project>) => {
   );
 };
 
-export const useEditProject = () => {
+// queryKey = ['projects', searchParams] 从外部获取
+export const useEditProject = (queryKey: QueryKey) => {
   const client = useHttp();
-  // useQueryClient返回QueryClient实例，QueryClient用于与cache交互
-  const queryClient = useQueryClient();
   // useMutation用于create/update/delete data
   return useMutation(
     (params: Partial<Project>) =>
@@ -22,31 +26,30 @@ export const useEditProject = () => {
         method: "PATCH",
         data: params,
       }),
-    {
-      // invalidateQueries用于refetch query，这里的'projects'可以直接弱匹配到所有以'projects'开头的
-      onSuccess: () => {
-        console.log("success");
-        queryClient.invalidateQueries("projects");
-      },
-    }
+    useEditConfig(queryKey)
   );
 };
 
-export const useAddProject = () => {
+export const useAddProject = (queryKey: QueryKey) => {
   const client = useHttp();
-  const queryClient = useQueryClient();
   return useMutation(
     (params: Partial<Project>) =>
       client(`projects`, {
         method: "POST",
         data: params,
       }),
-    {
-      onSuccess: () => {
-        console.log("success");
-        queryClient.invalidateQueries("projects");
-      },
-    }
+    useAddConfig(queryKey)
+  );
+};
+
+export const useDeleteProject = (queryKey: QueryKey) => {
+  const client = useHttp();
+  return useMutation(
+    ({ id }: { id: number }) =>
+      client(`projects/${id}`, {
+        method: "DELETE",
+      }),
+    useDeleteConfig(queryKey)
   );
 };
 
