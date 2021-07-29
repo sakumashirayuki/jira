@@ -9,7 +9,8 @@ import { cleanObject } from "utils";
 // 传入的泛型必须是string
 export const useUrlQueryParam = <K extends string>(keys: K[]) => {
   // 这里的searchParams是个iterable
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
+  const setSearchParams = useSetUrlSearchParams();
   return [
     useMemo(
       () =>
@@ -21,11 +22,20 @@ export const useUrlQueryParam = <K extends string>(keys: K[]) => {
       [searchParams] // React 认为只有在显式地调用了setSearchParams时，searchParams才发生改变
     ),
     (params: Partial<{ [key in K]: unknown }>) => {
-      const o = cleanObject({
-        ...Object.fromEntries(searchParams),
-        ...params,
-      }) as URLSearchParamsInit;
-      setSearchParams(o);
+      // 这个函数与useSetUrlSearchParams这个hook的功能是相同的
+      return setSearchParams(params);
     },
   ] as const;
+};
+
+// 用于设定url参数
+export const useSetUrlSearchParams = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  return (params: { [key in string]: unknown }) => {
+    const o = cleanObject({
+      ...Object.fromEntries(searchParams),
+      ...params,
+    }) as URLSearchParamsInit;
+    setSearchParams(o);
+  };
 };
