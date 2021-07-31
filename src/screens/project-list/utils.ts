@@ -1,5 +1,4 @@
 import { useMemo } from "react";
-import { useSearchParams } from "react-router-dom";
 import { useProject } from "utils/project";
 import { useSetUrlSearchParams, useUrlQueryParam } from "utils/url";
 

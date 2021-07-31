@@ -5,6 +5,7 @@ import { http } from "utils/http";
 import { useAsync } from "utils/use-async";
 import * as auth from "../auth-provider";
 import { User } from "../screens/project-list/search-panel";
+import { useQueryClient } from "react-query";
 
 interface AuthForm {
   username: string;
@@ -42,10 +43,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     run,
     setData: setUser,
   } = useAsync<User | null>();
+  const queryClient = useQueryClient();
   // point free
   const login = (form: AuthForm) => auth.login(form).then(setUser);
   const register = (form: AuthForm) => auth.register(form).then(setUser);
-  const logout = () => auth.logout().then(() => setUser(null));
+  const logout = () =>
+    auth.logout().then(() => {
+      setUser(null);
+      queryClient.clear(); // 清楚所有useQuery的数据
+    });
 
   useMount(() => {
     run(bootstrapUser()); // 检查登录状态

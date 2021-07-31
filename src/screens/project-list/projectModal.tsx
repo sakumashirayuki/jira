@@ -27,6 +27,11 @@ export const ProjectModal = () => {
     });
   };
 
+  const closeModal = () => {
+    form.resetFields();
+    close();
+  };
+
   const title = editingProject ? "编辑项目" : "创建项目"; // 如果是undefined，则是创建项目
 
   useEffect(() => {
@@ -38,46 +43,54 @@ export const ProjectModal = () => {
       forceRender={true}
       visible={projectModalOpen}
       width="100%"
-      onClose={close}
+      onClose={closeModal}
     >
-      {isLoading ? (
-        <Spin size="large" />
-      ) : (
+      {
         <Container>
-          <h1>{title}</h1>
-          <ErrorBox error={error} />
-          {/* Input的value被Form代理了，不用设置value和onChange */}
-          <Form
-            form={form}
-            layout="vertical"
-            style={{ width: "40rem" }}
-            onFinish={onFinish}
-          >
-            <Form.Item
-              label="名称"
-              name="name"
-              rules={[{ required: true, message: "请输入项目名" }]}
-            >
-              <Input placeholder="请输入项目名称" />
-            </Form.Item>
-            <Form.Item
-              label="部门"
-              name="organization"
-              rules={[{ required: true, message: "请输入部门名" }]}
-            >
-              <Input placeholder="请输入部门名" />
-            </Form.Item>
-            <Form.Item label="负责人" name="personId">
-              <UserSelect defaultOptionName="负责人" />
-            </Form.Item>
-            <Form.Item style={{ textAlign: "right" }}>
-              <Button loading={mutateLoading} type="primary" htmlType="submit">
-                提交
-              </Button>
-            </Form.Item>
-          </Form>
+          {isLoading ? (
+            <Spin size="large" />
+          ) : (
+            <>
+              <h1>{title}</h1>
+              <ErrorBox error={error} />
+              {/* Input的value被Form代理了，不用设置value和onChange */}
+              <Form
+                form={form}
+                layout="vertical"
+                style={{ width: "40rem" }}
+                onFinish={onFinish}
+              >
+                <Form.Item
+                  label="名称"
+                  name="name"
+                  rules={[{ required: true, message: "请输入项目名" }]}
+                >
+                  <Input placeholder="请输入项目名称" />
+                </Form.Item>
+                <Form.Item
+                  label="部门"
+                  name="organization"
+                  rules={[{ required: true, message: "请输入部门名" }]}
+                >
+                  <Input placeholder="请输入部门名" />
+                </Form.Item>
+                <Form.Item label="负责人" name="personId">
+                  <UserSelect defaultOptionName="负责人" />
+                </Form.Item>
+                <Form.Item style={{ textAlign: "right" }}>
+                  <Button
+                    loading={mutateLoading}
+                    type="primary"
+                    htmlType="submit"
+                  >
+                    提交
+                  </Button>
+                </Form.Item>
+              </Form>
+            </>
+          )}
         </Container>
-      )}
+      }
     </Drawer>
   );
 };
