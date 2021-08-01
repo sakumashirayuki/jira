@@ -1,5 +1,9 @@
-export const TaskTypeSelect = () => {
-  return <div>aaa</div>;
+import { useTaskTypes } from "utils/task-type";
+import { IdSelect } from "./id-select";
+
+export const TaskTypeSelect = (
+  props: React.ComponentProps<typeof IdSelect>
+) => {
+  const { data: taskTypes } = useTaskTypes();
+  return <IdSelect {...props} options={taskTypes || []} />;
 };
-// const { data: users } = useUsers();
-// return <IdSelect {...props} options={users || []} />;

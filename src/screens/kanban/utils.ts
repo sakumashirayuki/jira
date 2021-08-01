@@ -46,4 +46,4 @@ export const useTasksSearchParams = () => {
   return [tasksParam, setParam] as const;
 };
 
-export const useTasksQueryKey = () => ["tasks", useTasksSearchParams()];
+export const useTasksQueryKey = () => ["tasks", useTasksSearchParams()[0]];
