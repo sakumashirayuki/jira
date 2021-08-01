@@ -4,8 +4,8 @@ import { useMount } from "utils";
 import { http } from "utils/http";
 import { useAsync } from "utils/use-async";
 import * as auth from "../auth-provider";
-import { User } from "../screens/project-list/search-panel";
 import { useQueryClient } from "react-query";
+import { User } from "types/User";
 
 interface AuthForm {
   username: string;

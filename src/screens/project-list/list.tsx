@@ -4,18 +4,10 @@ import { ButtonNoPadding } from "components/lib";
 import { Pin } from "components/pin";
 import dayjs from "dayjs";
 import { Link } from "react-router-dom";
+import { Project } from "types/Project";
+import { User } from "types/User";
 import { useDeleteProject, useEditProject } from "utils/project";
-import { User } from "./search-panel";
 import { useProjectModal, useProjectsQueryKey } from "./utils";
-
-export interface Project {
-  id: number;
-  name: string;
-  personId: number;
-  pin: boolean;
-  organization: string;
-  created: number; // created time
-}
 
 interface ListProps extends TableProps<Project> {
   // ListProps包含了Table上所有属性的集合
