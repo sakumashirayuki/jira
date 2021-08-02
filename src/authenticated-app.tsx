@@ -18,7 +18,7 @@ import { ProjectPopover } from "components/project-popover";
 export const AuthenticatedApp = () => {
   // const value: any = undefined;
   return (
-    <div>
+    <Container>
       {/* 渲染中的异常，error-boundary能够处理
       {value.notExist} */}
       <Router>
@@ -33,7 +33,7 @@ export const AuthenticatedApp = () => {
         </Main>
         <ProjectModal />
       </Router>
-    </div>
+    </Container>
   );
 };
 
@@ -80,6 +80,12 @@ const User = () => {
   );
 };
 
+const Container = styled.div`
+  display: grid;
+  grid-template-rows: 6rem 1fr;
+  height: 100vh;
+`;
+
 const Header = styled(Row)`
   padding: 3.2rem;
   box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.1);
@@ -91,5 +97,6 @@ const HeaderLeft = styled(Row)``;
 const HeaderRight = styled.div``;
 
 const Main = styled.main`
-  height: calc(100vh - 6rem);
+  display: flex; //flex组件的子组件在主轴上和flex一样长（宽）
+  overflow: hidden;
 `;

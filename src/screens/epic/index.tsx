@@ -1,3 +1,9 @@
+import { ScreenContainer } from "components/lib";
+
 export const EpicScreen = () => {
-  return <h2>任务组</h2>;
+  return (
+    <ScreenContainer>
+      <h1>任务组</h1>
+    </ScreenContainer>
+  );
 };
