@@ -1,7 +1,7 @@
 import { QueryKey, useMutation, useQuery } from "react-query";
 import { Kanban } from "types/Kanban";
 import { useHttp } from "./http";
-import { useAddConfig } from "./use-optimistic-options";
+import { useAddConfig, useDeleteConfig } from "./use-optimistic-options";
 
 export const useKanbans = (param?: Partial<Kanban>) => {
   // name 和 personId都是Project参数的一部分
@@ -21,5 +21,16 @@ export const useAddKanban = (queryKey: QueryKey) => {
         data: params,
       }),
     useAddConfig(queryKey)
+  );
+};
+
+export const useDeleteKanban = (queryKey: QueryKey) => {
+  const client = useHttp();
+  return useMutation(
+    (params: Partial<Kanban>) =>
+      client(`kanbans/${params.id}`, {
+        method: "DELETE",
+      }),
+    useDeleteConfig(queryKey)
   );
 };

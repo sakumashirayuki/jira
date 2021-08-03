@@ -2,7 +2,11 @@ import { QueryKey, useMutation, useQuery } from "react-query";
 import { Task } from "types/Task";
 import { useDebounce } from "utils";
 import { useHttp } from "./http";
-import { useAddConfig } from "./use-optimistic-options";
+import {
+  useAddConfig,
+  useDeleteConfig,
+  useEditConfig,
+} from "./use-optimistic-options";
 
 export const useTasks = (param?: Partial<Task>) => {
   // name 和 personId都是Project参数的一部分
@@ -34,7 +38,18 @@ export const useEditTask = (queryKey: QueryKey) => {
         method: "PATCH",
         data: params,
       }),
-    useAddConfig(queryKey)
+    useEditConfig(queryKey)
+  );
+};
+
+export const useDeleteTask = (queryKey: QueryKey) => {
+  const client = useHttp();
+  return useMutation(
+    ({ id }: { id: number }) =>
+      client(`tasks/${id}`, {
+        method: "DELETE",
+      }),
+    useDeleteConfig(queryKey)
   );
 };
 
