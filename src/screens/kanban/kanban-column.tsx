@@ -1,6 +1,6 @@
 import { Kanban } from "types/Kanban";
 import { useTaskTypes } from "utils/task-type";
-import { useTasksSearchParams } from "./utils";
+import { useTaskModal, useTasksSearchParams } from "./utils";
 
 import taskIcon from "assets/task.svg";
 import bugIcon from "assets/bug.svg";
@@ -19,12 +19,17 @@ const TaskTypeIcon = ({ id }: { id: number }) => {
 export const KanbanColumn = ({ kanban }: { kanban: Kanban }) => {
   const { data: allTasks } = useTasks(useTasksSearchParams()[0]); // 参数为projectId
   const tasks = allTasks?.filter((item) => item.kanbanId === kanban.id);
+  const { startEdit } = useTaskModal();
   return (
     <Container>
       <h3>{kanban.name}</h3>
       <TasksContainer>
         {tasks?.map((task) => (
-          <Card key={task.id} style={{ marginBottom: "0.5rem" }}>
+          <Card
+            key={task.id}
+            style={{ marginBottom: "0.5rem", cursor: "pointer" }}
+            onClick={() => startEdit(task.id)}
+          >
             <div>{task.name}</div>
             <TaskTypeIcon id={task.typeId} />
           </Card>
