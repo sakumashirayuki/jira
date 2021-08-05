@@ -12,6 +12,8 @@ import { Task } from "types/Task";
 import { Mark } from "components/mark";
 import { useDeleteKanban } from "utils/kanban";
 import { Row } from "components/lib";
+import React from "react";
+import { Drag, Drop, DropChild } from "components/drag-and-drop";
 
 const TaskTypeIcon = ({ id }: { id: number }) => {
   const { data: taskTypes } = useTaskTypes();
@@ -67,25 +69,37 @@ const More = ({ kanban }: { kanban: Kanban }) => {
     </Dropdown>
   );
 };
-
-export const KanbanColumn = ({ kanban }: { kanban: Kanban }) => {
-  const { data: allTasks } = useTasks(useTasksSearchParams()[0]); // 参数为projectId
+// KanbanColumn需要定义为能够转发ref
+export const KanbanColumn = React.forwardRef<
+  HTMLDivElement,
+  { kanban: Kanban }
+>(({ kanban, ...props }, ref) => {
+  const { data: allTasks } = useTasks(useTasksSearchParams()[0]); // 参数为projectId,这里获取的为当前project的所有task
   const tasks = allTasks?.filter((item) => item.kanbanId === kanban.id);
   return (
-    <Container>
+    // 将剩下的props传给Container
+    <Container ref={ref} {...props}>
       <Row between={true}>
         <h3>{kanban.name}</h3>
-        <More kanban={kanban} />
+        <More kanban={kanban} key={kanban.id} />
       </Row>
       <TasksContainer>
-        {tasks?.map((task) => (
-          <TaskCard task={task} />
-        ))}
+        <Drop type="ROW" direction="vertical" droppableId={String(kanban.id)}>
+          <DropChild>
+            {tasks?.map((task, index) => (
+              <Drag key={task.id} index={index} draggableId={"task" + task.id}>
+                <div>
+                  <TaskCard task={task} key={task.id} />
+                </div>
+              </Drag>
+            ))}
+          </DropChild>
+        </Drop>
         <CreateTask kanbanId={kanban.id} />
       </TasksContainer>
     </Container>
   );
-};
+});
 
 export const Container = styled.div`
   min-width: 27rem;

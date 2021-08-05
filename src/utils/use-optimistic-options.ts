@@ -2,17 +2,19 @@ import { QueryKey, useQueryClient } from "react-query";
 
 export const useConfig = (
   queryKey: QueryKey,
-  callback: (target: any, old?: any[]) => any[]
+  callback: (target: any, old?: any[]) => any[] // callback参数用于乐观更新
 ) => {
   // useQueryClient返回QueryClient实例，QueryClient用于与cache交互
   const queryClient = useQueryClient();
   return {
     onSuccess: () => {
+      // 主要是用来mutate完了之后及时刷新数据
       // invalidateQueries用于refetch query，这里的'projects'可以直接弱匹配到所有以'projects'开头的
       console.log("success");
       queryClient.invalidateQueries(queryKey);
     },
     async onMutate(target: any) {
+      // 用于乐观更新。
       // useMutation一发生，onMutate就被调用
       const previousItems = queryClient.getQueryData(queryKey);
       queryClient.setQueryData(queryKey, (old?: any[]) => {
@@ -44,3 +46,7 @@ export const useEditConfig = (queryKey: QueryKey) =>
   );
 export const useAddConfig = (queryKey: QueryKey) =>
   useConfig(queryKey, (target, old) => (old ? [...old, target] : [target]));
+
+//TODO 目前已经有刷新功能，但没有乐观更新
+export const useReorderConfig = (queryKey: QueryKey) =>
+  useConfig(queryKey, (target, old) => old || []);

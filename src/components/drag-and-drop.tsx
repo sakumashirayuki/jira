@@ -33,8 +33,14 @@ type DropChildProps = Partial<
   { provided: DroppableProvided } & DroppableProvidedProps
 > &
   React.HTMLAttributes<HTMLDivElement>; //就是用于作为Drop的child，同时也可以传入普通的div
-export const DropChild = React.forwardRef<HTMLDivElement, DropChildProps>(
-  (props, ref) => <div ref={ref} {...props} />
+
+export const DropChild = React.forwardRef<HTMLDivElement, DropChildProps>( // 符合api要求
+  ({ children, ...props }, ref) => (
+    <div ref={ref} {...props}>
+      {children}
+      {props.provided?.placeholder}
+    </div>
+  )
 );
 
 type DragProps = Omit<DraggableProps, "children"> & { children: ReactNode };
