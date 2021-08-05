@@ -85,7 +85,8 @@ export const KanbanColumn = React.forwardRef<
       </Row>
       <TasksContainer>
         <Drop type="ROW" direction="vertical" droppableId={String(kanban.id)}>
-          <DropChild>
+          {/* DropChild需要有高度时，才能往里面drop内容 */}
+          <DropChild style={{ minHeight: "5px" }}>
             {tasks?.map((task, index) => (
               <Drag key={task.id} index={index} draggableId={"task" + task.id}>
                 <div>
