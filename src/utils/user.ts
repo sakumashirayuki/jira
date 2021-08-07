@@ -1,16 +1,12 @@
-import { useEffect } from "react";
+import { useQuery } from "react-query";
 import { User } from "types/User";
-import { cleanObject } from "utils";
 import { useHttp } from "./http";
-import { useAsync } from "./use-async";
 
 export const useUsers = (param?: Partial<User>) => {
+  // name 和 personId都是Project参数的一部分
   const client = useHttp();
-  const { run, ...result } = useAsync<User[]>();
-
-  useEffect(() => {
-    run(client("users", { data: cleanObject(param || {}) }));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [param]);
-  return result;
+  // 当第一个参数数组内的值变化时，就会触发
+  return useQuery<User[]>(["users", param], () =>
+    client("users", { data: param })
+  );
 };
