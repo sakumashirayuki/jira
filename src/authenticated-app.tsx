@@ -16,7 +16,7 @@ import { ProjectModal } from "screens/project-list/projectModal";
 import { ProjectPopover } from "components/project-popover";
 import { UserPopover } from "components/user-popover";
 
-export const AuthenticatedApp = () => {
+const AuthenticatedApp = () => {
   // const value: any = undefined;
   return (
     <Container>
@@ -37,6 +37,7 @@ export const AuthenticatedApp = () => {
     </Container>
   );
 };
+export default AuthenticatedApp;
 
 // const HeaderItem = styled.h3`
 //   margin-right: 3rem;
