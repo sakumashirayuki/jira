@@ -10,6 +10,7 @@ import {
   Row,
   ScreenContainer,
 } from "components/lib";
+import { Profiler } from "components/profiler";
 
 export const ProjectListScreen = () => {
   useDocumentTitle("项目列表", false);
@@ -21,18 +22,20 @@ export const ProjectListScreen = () => {
   const { open } = useProjectModal();
 
   return (
-    <ScreenContainer>
-      <Row between={true}>
-        <h1>项目列表</h1>
-        <ButtonNoPadding type="link" onClick={open}>
-          创建项目
-        </ButtonNoPadding>
-      </Row>
-      <SearchPanel param={param} setParam={setParam} users={users || []} />
-      <ErrorBox error={error} />
-      {/* dataSource是TableProps中的属性 */}
-      <List loading={isLoading} dataSource={list || []} users={users || []} />
-    </ScreenContainer>
+    <Profiler id="项目列表">
+      <ScreenContainer>
+        <Row between={true}>
+          <h1>项目列表</h1>
+          <ButtonNoPadding type="link" onClick={open}>
+            创建项目
+          </ButtonNoPadding>
+        </Row>
+        <SearchPanel param={param} setParam={setParam} users={users || []} />
+        <ErrorBox error={error} />
+        {/* dataSource是TableProps中的属性 */}
+        <List loading={isLoading} dataSource={list || []} users={users || []} />
+      </ScreenContainer>
+    </Profiler>
   );
 };
 
