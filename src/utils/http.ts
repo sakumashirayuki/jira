@@ -4,7 +4,7 @@ import { useAuth } from "context/auth-context";
 import { useCallback } from "react";
 
 const apiUrl = process.env.REACT_APP_API_URL;
-
+// backend的应用部署在localhost:3001上
 interface Config extends RequestInit {
   token?: string; // 问号表示这是一个可选参数
   data?: object;
