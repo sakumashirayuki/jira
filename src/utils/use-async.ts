@@ -76,7 +76,7 @@ export const useAsync = <D>(
         // retry是个函数，这里调用retry函数，并将返回的promise赋给run
         if (runConfig?.retry) run(runConfig?.retry(), runConfig);
       });
-      // 使用prevState，避免将state作为依赖
+      // 使用prevState，避免将state作为依赖。safeDispatch涉及一些异步操作
       safeDispatch({ stat: "loading" });
       return promise
         .then((data) => {
